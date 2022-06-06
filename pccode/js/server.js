@@ -62,13 +62,22 @@ function originIsAllowed(origin) {
 let targetConnections = new Map();
 let frontConnections = new Map();
 
+
+function getRandomConnection(activeConnections) {
+    const index =  Math.floor(Math.random() * activeConnections.length);
+    return activeConnections[index];
+}
+
 function sendToTarget(command) {
-    const connection = [...targetConnections.values()].find(c => c.connected);
+    // const connection = [...targetConnections.values()].find(c => c.connected);
+    const connections = [...targetConnections.values()].filter(c => c.connected);
+
+    const connection = getRandomConnection(connections);
 
     if (connection) {
         console.log("connection:", connection.remoteAddress); // !DEBUG!
         const timestamp = new Date().toJSON();
-        const maxWait = 2000;
+        const maxWait = 20000;
         const data = {command, timestamp, maxWait};
         const dataStr = JSON.stringify(data);
         console.log(`\n HIT IT  !!! data: ${dataStr}`);
@@ -94,7 +103,7 @@ function sendToFront(data) {
 
 let gameRunning = false;
 let startTime = null;
-let gameDuration = 10000; // 10 sec
+let gameDuration = 60000; // 60 sec
 
 wsServer.on('request', request => {
     if (!originIsAllowed(request.origin)) {
