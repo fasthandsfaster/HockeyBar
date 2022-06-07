@@ -56,21 +56,21 @@ void app_main(void)
     //for (int green = 255; green >= 0 ; green -= 15) {
     //    printf("in main loop\n");
     //while (true) {
-        //if (green < 100) {
-        //    red += 40;
-        //}
-        for (int i = 0; i < 44; i++) {
-            printf("in led loop\n");
-            //led_strip_hsv2rgb(10, 100, 100, &red, &green, &blue);
-                // Write RGB values to strip driver
-                printf("led: %d\n", i);
-                printf("buffers: %d\n", 4 - (i % 2)); 
-            ESP_ERROR_CHECK(strip_one->set_pixel(strip_one, i,0, 255, 0,  4 - (i % 2)));
-            printf("pixel set\n");
-            // Flush RGB values to LEDs 
-        }
-        ESP_ERROR_CHECK(strip_one->refresh(strip_one, 100));
-        printf("pixel refresh\n");
+    //if (green < 100) {
+    //    red += 40;
+    //}
+    for (int i = 0; i < CONFIG_EXAMPLE_STRIP_LED_NUMBER; i++) {
+        printf("in led loop\n");
+        // led_strip_hsv2rgb(10, 100, 100, &red, &green, &blue);
+        // Write RGB values to strip driver
+        printf("led: %d\n", i);
+        printf("buffers: %d\n", 4 - (i % 2)); 
+        ESP_ERROR_CHECK(strip_one->set_pixel(strip_one, i, 255, 0, 0,  4 - (i % 2)));
+        printf("pixel set\n");
+        // Flush RGB values to LEDs 
+               }
+    ESP_ERROR_CHECK(strip_one->refresh(strip_one, 100));
+    printf("pixel refresh\n");
     //}
     vTaskDelay(15);
 }
