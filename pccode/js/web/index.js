@@ -4,15 +4,15 @@ const targetDataTag = $("#target-data");
 
 function startGame() {
     const origin = 'front-ui';
-    const command = 'start';
+    const task = 'start';
     targetDataTag.empty();
-    ws.send(JSON.stringify({origin, command}));
+    ws.send(JSON.stringify({origin, task}));
 }
 
 function stopGame() {
     const origin = 'front-ui';
-    const command = 'stop';
-    ws.send(JSON.stringify({origin, command}));
+    const task = 'stop';
+    ws.send(JSON.stringify({origin, task}));
     targetDataTag.append('Stopped', $("<br/>"));
 }
 

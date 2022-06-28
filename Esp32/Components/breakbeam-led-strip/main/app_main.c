@@ -12,7 +12,8 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_websocket_client.h"
+//#include "esp_websocket_client.h"
+#include "websocket.h"
 #include "driver/rmt.h"
 #include "led_strip.h"
 
@@ -40,7 +41,7 @@ void runCounter(void* arg) {
     int n = 1;
     while(1) {
         sprintf(numstr, "%04X", n++);
-        max7219_sendText(spi, numstr);
+        //max7219_sendText(spi, numstr);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
@@ -91,12 +92,12 @@ void app_main(void) {
     printf("PIN_NUM_CLK:  %d\n", PIN_NUM_CLK);
     printf("PIN_NUM_CS:   %d\n", PIN_NUM_CS);
 
-    spi = max7219_initSpiBus(PIN_NUM_MOSI, PIN_NUM_CLK, PIN_NUM_CS);
+    //spi = max7219_initSpiBus(PIN_NUM_MOSI, PIN_NUM_CLK, PIN_NUM_CS);
 
-    max7219_sendNumber(spi, 0);
+    //max7219_sendNumber(spi, 0);
 
-    max7219_init(spi);
-    max7219_sendText(spi, "BOOT");
+    //max7219_init(spi);
+    //max7219_sendText(spi, "BOOT");
 
     led_strip_t *strip_one = install_led_strip();
 
@@ -106,7 +107,7 @@ void app_main(void) {
    
     breakbeam_start(websocket_client_handle, spi, ip4_addr_str, strip_one);
     
-    max7219_sendText(spi, "PLAY");
+    //max7219_sendText(spi, "PLAY");
     
     // Start counter task with lower priority than the breakbeam
     /* xTaskCreate(runCounter, "runCounter", 2048, NULL, 1, NULL);   */

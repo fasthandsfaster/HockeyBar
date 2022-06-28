@@ -146,7 +146,7 @@ led_strip_t *led_strip_new_rmt_ws2812(const led_strip_config_t *config)
     STRIP_CHECK(config, "configuration can't be null", err, NULL);
 
     // 24 bits per led
-    uint32_t ws2812_size = sizeof(ws2812_t) + config->max_leds * 3;
+    uint32_t ws2812_size = sizeof(ws2812_t) + ((config->max_leds * 3)/2 + (config->max_leds * 4)/2);
     ws2812_t *ws2812 = calloc(1, ws2812_size);
     STRIP_CHECK(ws2812, "request memory for ws2812 failed", err, NULL);
 

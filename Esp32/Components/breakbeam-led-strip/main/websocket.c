@@ -22,8 +22,8 @@
 #include "breakbeam.h"
 
 #define NO_DATA_TIMEOUT_SEC 10
-/* #define WEBSOCKET_SERVER_URI "ws://192.168.0.45:8080/target" */
-#define WEBSOCKET_SERVER_URI "ws://192.168.0.26:8080/target" // LARS
+#define WEBSOCKET_SERVER_URI "ws://192.168.192.149:8081/target"
+//#define WEBSOCKET_SERVER_URI "ws://172.20.10.3:8080/target" // LARS
 
 static const char *TAG = "BLS_WS";
 

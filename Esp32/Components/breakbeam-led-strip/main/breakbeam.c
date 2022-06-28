@@ -12,7 +12,6 @@
 
 #include "websocket.h"
 #include "laso_util.h"
-#include "max7219.h"
 
 
 #define GPIO_INPUT_IO_A     4
@@ -82,7 +81,7 @@ static void breakbeam_trigger(void* arg) {
 
             if (maxWaitForBeamMillis > 0) {
                 if (trigger_running) {
-                    max7219_sendText(trigger_data->spi_device_handle, "FIRE");
+                    //max7219_sendText(trigger_data->spi_device_handle, "FIRE");
                     setStripColor(trigger_data->strip_one, STRIP_COLOR_GREEN);
 
                     long start = xTaskGetTickCount();
@@ -90,7 +89,7 @@ static void breakbeam_trigger(void* arg) {
                     /* Wait for hit or time out*/
                     int value;
                     if(xQueueReceive(gpio_evt_queue, &value, maxWaitForBeamMillis / portTICK_PERIOD_MS)) {
-                        max7219_sendText(trigger_data->spi_device_handle, "GOAL");
+                        //max7219_sendText(trigger_data->spi_device_handle, "GOAL");
                         setStripColor(trigger_data->strip_one, STRIP_COLOR_BLUE);
 
                         /* Beam was hit */
@@ -109,7 +108,7 @@ static void breakbeam_trigger(void* arg) {
                         send_text_to_server(trigger_data->websocket_client_handle, json);
                     }
                     else {
-                        max7219_sendText(trigger_data->spi_device_handle, "MISS");
+                        //max7219_sendText(trigger_data->spi_device_handle, "MISS");
                         setStripColor(trigger_data->strip_one, STRIP_COLOR_RED);
 
                         /* Make a small delay so we can read the display */
@@ -127,7 +126,8 @@ static void breakbeam_trigger(void* arg) {
                 }
             }
             else {
-                max7219_sendText(trigger_data->spi_device_handle, "OVER");
+                //max7219_sendText(trigger_data->spi_device_handle, "OVER");
+                printf("game over");
             }
         }
     }

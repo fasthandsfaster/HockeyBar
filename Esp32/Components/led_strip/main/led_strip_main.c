@@ -13,37 +13,36 @@
 #include "driver/rmt.h"
 #include "led_strip.h"
 #include "driver/gpio.h"
+#include "7seg.h"
 
 static const char *TAG = "example";
 
 #define RMT_TX_CHANNEL_ONE RMT_CHANNEL_0
 
-#define GPIO_OUTPUT_IO_0 (39)
-// #define GPIO_OUTPUT_IO_40 (40)
+#define EXAMPLE_STRIP_LED_NUMBER 44
+#define EXAMPLE_RMT_TX_GPIO_ONE 35
 
-#define EXAMPLE_CHASE_SPEED_MS (10)
+uint32_t red = 0;
+uint32_t green = 0;
+uint32_t blue = 0;
 
 
 void app_main(void)
 {
-    //uint32_t red = 50;
-    //int fadingred = 255;
-    uint32_t red = 0;
-    uint32_t blue = 0;
-    printf("Starting main!!!!!!!!!!!!\n");
+    shownumber(888);
 
-    rmt_config_t config_one = RMT_DEFAULT_CONFIG_TX(CONFIG_EXAMPLE_RMT_TX_GPIO_ONE, RMT_TX_CHANNEL_ONE);
+    rmt_config_t config_one = RMT_DEFAULT_CONFIG_TX(EXAMPLE_RMT_TX_GPIO_ONE, RMT_TX_CHANNEL_ONE);
     // set counter clock to 40MHz
     config_one.clk_div = 2;
-    printf("main:-1\n");
+   
     ESP_ERROR_CHECK(rmt_config(&config_one));
-    printf("main:0\n");
+    
     ESP_ERROR_CHECK(rmt_driver_install(config_one.channel, 0, 0));
-    printf("main:1\n");
+    
     // install ws2812 driver
     led_strip_config_t strip_config_one = LED_STRIP_DEFAULT_CONFIG(CONFIG_EXAMPLE_STRIP_LED_NUMBER, (led_strip_dev_t)config_one.channel);
     led_strip_t *strip_one = led_strip_new_rmt_ws2812(&strip_config_one);
-    printf("main:2\n");
+    
     if (!strip_one) {
         ESP_LOGE(TAG, "install first WS2812 driver failed");
     }
@@ -51,26 +50,32 @@ void app_main(void)
     ESP_ERROR_CHECK(strip_one->clear(strip_one, 100));
     printf("main:3\n");
     
-
-    //fadingred = red;
-    //for (int green = 255; green >= 0 ; green -= 15) {
-    //    printf("in main loop\n");
-    //while (true) {
-    //if (green < 100) {
-    //    red += 40;
-    //}
-    for (int i = 0; i < CONFIG_EXAMPLE_STRIP_LED_NUMBER; i++) {
-        printf("in led loop\n");
-        // led_strip_hsv2rgb(10, 100, 100, &red, &green, &blue);
-        // Write RGB values to strip driver
-        printf("led: %d\n", i);
-        printf("buffers: %d\n", 4 - (i % 2)); 
-        ESP_ERROR_CHECK(strip_one->set_pixel(strip_one, i, 255, 0, 0,  4 - (i % 2)));
-        printf("pixel set\n");
-        // Flush RGB values to LEDs 
-               }
-    ESP_ERROR_CHECK(strip_one->refresh(strip_one, 100));
-    printf("pixel refresh\n");
-    //}
+    for (int c = 0; c < 5; c++) {
+        red = 0;
+        green = 0;
+        blue = 0;
+        switch(c) {
+            case 1 :
+                red = 80;
+                break;
+            case 2 :
+                green = 80;
+                break;
+            case 3 :
+                blue = 80;
+                break;
+        }
+        for (int i = 0; i < EXAMPLE_STRIP_LED_NUMBER; i++) {
+            printf("in led loop\n");
+            // led_strip_hsv2rgb(10, 100, 100, &red, &green, &blue);
+            // Write RGB values to strip driver
+            ESP_ERROR_CHECK(strip_one->set_pixel(strip_one, i, red, green, blue,  4 - (i % 2)));
+            printf("pixel set\n");
+            // Flush RGB values to LEDs 
+        }
+        ESP_ERROR_CHECK(strip_one->refresh(strip_one, 100));
+        vTaskDelay(100);
+    }
+    
     vTaskDelay(15);
 }

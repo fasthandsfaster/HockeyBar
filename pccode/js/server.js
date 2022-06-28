@@ -12,7 +12,7 @@ const myLocalIp = Object.values(OS.networkInterfaces())
       .filter(n => n.family == "IPv4" && !n.internal)
       .find(e => e).address;
 
-const LISTENER_PORT = 8080;
+const LISTENER_PORT = 8081;
 const serverUrl = `ws://${myLocalIp}:${LISTENER_PORT}`;
 
 const mimeTypes = new Map([
@@ -40,7 +40,7 @@ function httpServerHandler(request, response) {
 
 const httpServer = http.createServer(httpServerHandler);
 
-httpServer.listen(LISTENER_PORT, () => {
+httpServer.listen(LISTENER_PORT,myLocalIp, () => {
     console.log(`Server is listening on ${serverUrl}`);
 });
 
@@ -51,7 +51,7 @@ const wsServer = new WebSocketServer({
     // facilities built into the protocol and the browser.  You should
     // *always* verify the connection's origin and decide whether or not
     // to accept it.
-    autoAcceptConnections: false
+    autoAcceptConnections: true
 });
 
 function originIsAllowed(origin) {
@@ -68,7 +68,7 @@ function getRandomConnection(activeConnections) {
     return activeConnections[index];
 }
 
-function sendToTarget(command) {
+function sendToTarget(task) {
     // const connection = [...targetConnections.values()].find(c => c.connected);
     const connections = [...targetConnections.values()].filter(c => c.connected);
 
@@ -77,8 +77,8 @@ function sendToTarget(command) {
     if (connection) {
         console.log("connection:", connection.remoteAddress); // !DEBUG!
         const timestamp = new Date().toJSON();
-        const maxWait = 20000;
-        const data = {command, timestamp, maxWait};
+        const timeOpen = 3000;
+        const data = {task, timestamp, timeOpen};
         const dataStr = JSON.stringify(data);
         console.log(`\n HIT IT  !!! data: ${dataStr}`);
         connection.sendUTF(dataStr);
@@ -103,7 +103,8 @@ function sendToFront(data) {
 
 let gameRunning = false;
 let startTime = null;
-let gameDuration = 60000; // 60 sec
+let gameDuration = 30000; // 60 sec
+let hitCount = 0
 
 wsServer.on('request', request => {
     if (!originIsAllowed(request.origin)) {
@@ -144,18 +145,21 @@ wsServer.on('request', request => {
             const msgData = JSON.parse(message.utf8Data);
 
             if (msgData.origin == 'front-ui') {
-                if (msgData.command == 'start' && !gameRunning) {
+                if (msgData.task == 'start' && !gameRunning) {
                     gameRunning = true;
                     startTime = new Date();
                     console.log("gameRunning:", gameRunning); // !DEBUG!
                 }
-                if (msgData.command == 'stop' && gameRunning) {
+                if (msgData.task == 'stop' && gameRunning) {
                     gameRunning = false;
                     console.log("gameRunning:", gameRunning); // !DEBUG!
                 }
             }
             else {
                 sendToFront(message.utf8Data);
+                if (msgData.solved == true) {
+                    hitCount += 1;
+                }
             }
 
             if (gameRunning) {
@@ -167,6 +171,9 @@ wsServer.on('request', request => {
                     gameRunning = false
                     sendToTarget('over');
                     sendToFront('Game Over');
+                    sendToFront('Total hits:');
+                    sendToFront(hitCount);
+                    hitCount = 0
                 }
             }
         }
